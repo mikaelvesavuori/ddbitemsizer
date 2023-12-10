@@ -1,0 +1,16 @@
+# Files
+.env
+.dccache
+.DS_Store
+tsconfig.tsbuildinfo
+
+# Folders
+node_modules/
+lib/
+dist/
+docs/
+coverage/
+jest-coverage/
+.webpack/
+.esbuild/
+.serverless/

@@ -1,0 +1,1 @@
+export { DynamoDbItemSizer } from './DynamoDbItemSizer';
