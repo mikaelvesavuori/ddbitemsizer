@@ -1,7 +1,7 @@
 {
   "name": "ddbitemsizer",
   "description": "Get the byte size of your DynamoDB input.",
-  "version": "0.0.3",
+  "version": "1.0.0",
   "author": "Mikael Vesavuori",
   "license": "MIT",
   "main": "./lib/index.js",
