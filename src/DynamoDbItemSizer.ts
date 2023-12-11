@@ -131,9 +131,9 @@ export class DynamoDbItemSizer {
     else if (type === 'binary') return this.binarySize(val);
     else if (type === 'boolean') return this.booleanOrNullSize();
     else if (type === 'null') return this.booleanOrNullSize();
-    else if (type === 'stringset') return this.stringSetSize(val);
-    else if (type === 'numberset') return this.numberSetSize(val);
-    else if (type === 'binaryset') return this.binarySetSize(val);
+    else if (type === 'stringset') return this.setSize(val, this.stringSize);
+    else if (type === 'numberset') return this.setSize(val, this.numberSize);
+    else if (type === 'binaryset') return this.setSize(val, this.binarySize);
     else if (type === 'list') return this.listSetSize(val);
     else if (type === 'map') return this.mapSize(val);
 
@@ -145,14 +145,10 @@ export class DynamoDbItemSizer {
   }
 
   private numberSize(val: string) {
-    const fixedValue = this.removeTrailingZeroes(parseFloat(val)).toString();
+    const fixedValue = removeTrailingZeroes(parseFloat(val)).toString();
     const result = fixedValue.match(/.{1,2}/g)?.length || 0;
     const extraBytes = parseFloat(val) > 0 ? 1 : 2;
     return result + extraBytes;
-  }
-
-  private removeTrailingZeroes(val: number) {
-    return parseFloat(val.toString().replace(/0+$/, ''));
   }
 
   private binarySize(val: any) {
@@ -163,16 +159,8 @@ export class DynamoDbItemSizer {
     return 1;
   }
 
-  private stringSetSize(val: string[]) {
-    return val.reduce((total: number, current: string) => total + this.stringSize(current), 0);
-  }
-
-  private numberSetSize(val: string[]) {
-    return val.reduce((total: number, current: string) => total + this.numberSize(current), 0);
-  }
-
-  private binarySetSize(val: string[]) {
-    return val.reduce((total: number, current: string) => total + this.binarySize(current), 0);
+  private setSize(val: string[], sizeFunction: any) {
+    return val.reduce((total: number, current: string) => total + sizeFunction(current), 0);
   }
 
   private listSetSize(val: string[]) {
@@ -198,6 +186,9 @@ export class DynamoDbItemSizer {
     return values.reduce((total: number, current: number) => total + current) + 3; // This is, presumably, for the "M" attribute and the array brackets
   }
 }
+
+// Needs to be broken out because of "this" getting confused when passing the size functions
+const removeTrailingZeroes = (val: number) => parseFloat(val.toString().replace(/0+$/, ''));
 
 type DynamoDbType =
   | 'string'
